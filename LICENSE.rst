@@ -1,6 +1,6 @@
-BSD 2-Clause License
-
-Copyright (c) 2017, Emmanuel Levijarvi
+License
+===============================================================================
+Copyright © 2017, Kevala Analytics, INC.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
