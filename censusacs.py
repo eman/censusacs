@@ -50,6 +50,13 @@ class CensusACS(object):
         columns = response.pop(0)
         df = pd.DataFrame(response, columns=columns)
         df.rename(columns=VARIABLES, inplace=True)
+        df = df.apply(pd.to_numeric, errors='ignore')
+        df['owner_occupied_percent'] = (
+            100 * df['owner_occupied_housing_units'] / df['housing_units'])
+        df.owner_occupied_percent = df.owner_occupied_percent.round(0)
+        df['renter_occupied_percent'] = (
+            100 * df['renter_occupied_housing_units'] / df['housing_units'])
+        df.renter_occupied_percent = df.renter_occupied_percent.round()
         return df.to_dict(orient='records')
 
     def get_zcta(self, state, zcta="*"):
@@ -77,6 +84,5 @@ class CensusACS(object):
 
 if __name__ == "__main__":
     c = CensusACS('2015')
-    results = c.get_counties("09")
-    for result in results:
-        print(result)
+    for tract in c.get_census_tracts("09"):
+        print(tract)
