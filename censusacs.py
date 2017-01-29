@@ -50,7 +50,6 @@ class CensusACS(object):
         columns = response.pop(0)
         df = pd.DataFrame(response, columns=columns)
         df.rename(columns=VARIABLES, inplace=True)
-        # df = df.apply(pd.to_numeric, errors='ignore')
         df.owner_occupied_housing_units = pd.to_numeric(df.owner_occupied_housing_units)
         df.renter_occupied_housing_units = pd.to_numeric(df.renter_occupied_housing_units)
         df.housing_units = pd.to_numeric(df.housing_units)
@@ -74,7 +73,10 @@ class CensusACS(object):
         return self.get_data(state, 'county', county)
 
     def get_census_tracts(self, state, tract="*"):
-        return self.get_data(state, 'tract', tract)
+        tracts = self.get_data(state, 'tract', "*")
+        if tract != "*":
+            tracts = [t for t in tracts if t['tract'] == tract][0]
+        return tracts
 
     def get_state_legislative_districts_upper(self, state, district="*"):
         geography_type = 'state+legislative+district+(upper+chamber)'
@@ -87,5 +89,4 @@ class CensusACS(object):
 
 if __name__ == "__main__":
     c = CensusACS('2015')
-    for tract in c.get_census_tracts("09"):
-        print(tract)
+    print(c.get_census_tracts("09", "904100"))
