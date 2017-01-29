@@ -50,7 +50,10 @@ class CensusACS(object):
         columns = response.pop(0)
         df = pd.DataFrame(response, columns=columns)
         df.rename(columns=VARIABLES, inplace=True)
-        df = df.apply(pd.to_numeric, errors='ignore')
+        # df = df.apply(pd.to_numeric, errors='ignore')
+        df.owner_occupied_housing_units = pd.to_numeric(df.owner_occupied_housing_units)
+        df.renter_occupied_housing_units = pd.to_numeric(df.renter_occupied_housing_units)
+        df.housing_units = pd.to_numeric(df.housing_units)
         df['owner_occupied_percent'] = (
             100 * df['owner_occupied_housing_units'] / df['housing_units'])
         df.owner_occupied_percent = df.owner_occupied_percent.round(0)

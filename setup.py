@@ -12,7 +12,7 @@ for rst in ('README.rst', 'LICENSE.rst'):
 
 
 setup(name='censusacs',
-      version='0.9.1',
+      version='0.9.2',
       description=description,
       long_description='\n\n'.join(long_descriptions),
       author='Kevala Analytics, Inc.',
