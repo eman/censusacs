@@ -55,6 +55,7 @@ class CensusACS(object):
         params = {'get': variables, 'for': geographies, 'in': state}
         params_str = "&".join("{}={}".format(k, v) for k, v in params.items())
         response = requests.get(self.acs_endpoint, params_str)
+        print(response.url)
         if not response.ok:
             raise ACSError(response.text, response.url, self.variables)
         response = response.json()
