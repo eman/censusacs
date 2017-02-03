@@ -1,3 +1,4 @@
+import json
 import requests
 import pandas as pd
 
@@ -11,6 +12,14 @@ VARIABLES = {'NAME': 'geography_name',
              'B25075_001E': 'owner_occupied_housing_units',
              'B25003_003E': 'renter_occupied_housing_units',
              'B25002_003E': 'vacant_housing_units'}
+
+ALTERNATE_KEYS = {
+    'census_tract': 'tract',
+    'state_legislative_district_lower':
+        'state+legislative+district+(lower+chamber)',
+    'state_legislative_district_upper':
+        'state+legislative+district+(upper+chamber)',
+    'zcta': 'zip+code+tabulation+area'}
 
 
 class ACSError(Exception):
@@ -38,6 +47,8 @@ class CensusACS(object):
     def get_data(self, state, geography_type, geography="*"):
         if not isinstance(geography, str):
             geography = ','.join(geography)
+        if geography_type in ALTERNATE_KEYS:
+            geography_type = ALTERNATE_KEYS[geography_type]
         variables = ','.join(self.variables)
         state = 'state:{}'.format(state)
         geographies = "{}:{}".format(geography_type, geography)
@@ -89,4 +100,6 @@ class CensusACS(object):
 
 if __name__ == "__main__":
     c = CensusACS('2015')
-    print(c.get_census_tracts("09", "904100"))
+    # response = c.get_congressional_districts("09")
+    response = c.get_data("09", "state_legislative_district_lower", "001")
+    print(json.dumps(response))
