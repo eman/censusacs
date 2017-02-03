@@ -75,7 +75,10 @@ class CensusACS(object):
         df['renter_occupied_percent'] = (
             100 * df['renter_occupied_housing_units'] / df['housing_units'])
         df.renter_occupied_percent = df.renter_occupied_percent.round()
-        return df.to_dict(orient='records')
+        records = df.to_dict(orient='records')
+        if len(records) == 1:
+            return records[0]
+        return records
 
     def get_zcta(self, state, zcta="*"):
         geography_type = 'zip+code+tabulation+area'
