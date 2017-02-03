@@ -39,7 +39,8 @@ class CensusACS(object):
         if isinstance(variables, str):
             variables = [variables]
         self.variables = list(variables)
-
+# https://api.census.gov/data/{year}/{frequency}
+# http://api.census.gov/data/{year}/acs5?get=NAME,B01001_001E&for=state:06
     @property
     def acs_endpoint(self):
         return ACS_ENDPOINT.format(year=self.year, frequency=self.frequency)
@@ -53,6 +54,9 @@ class CensusACS(object):
         state = 'state:{}'.format(state)
         geographies = "{}:{}".format(geography_type, geography)
         params = {'get': variables, 'for': geographies, 'in': state}
+        if geography_type == 'state':
+            params.pop('in')
+            params['for'] = state
         params_str = "&".join("{}={}".format(k, v) for k, v in params.items())
         response = requests.get(self.acs_endpoint, params_str)
         print(response.url)
