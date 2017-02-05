@@ -39,8 +39,7 @@ class CensusACS(object):
         if isinstance(variables, str):
             variables = [variables]
         self.variables = list(variables)
-# https://api.census.gov/data/{year}/{frequency}
-# http://api.census.gov/data/{year}/acs5?get=NAME,B01001_001E&for=state:06
+
     @property
     def acs_endpoint(self):
         return ACS_ENDPOINT.format(year=self.year, frequency=self.frequency)
@@ -66,15 +65,22 @@ class CensusACS(object):
         columns = response.pop(0)
         df = pd.DataFrame(response, columns=columns)
         df.rename(columns=VARIABLES, inplace=True)
-        df.owner_occupied_housing_units = pd.to_numeric(df.owner_occupied_housing_units)
-        df.renter_occupied_housing_units = pd.to_numeric(df.renter_occupied_housing_units)
+        df.owner_occupied_housing_units = pd.to_numeric(
+            df.owner_occupied_housing_units)
+        df.renter_occupied_housing_units = pd.to_numeric(
+            df.renter_occupied_housing_units)
         df.housing_units = pd.to_numeric(df.housing_units)
+        df.vacant_housing_units = pd.to_numeric(df.vacant_housing_units)
         df['owner_occupied_percent'] = (
             100 * df['owner_occupied_housing_units'] / df['housing_units'])
         df.owner_occupied_percent = df.owner_occupied_percent.round(0)
         df['renter_occupied_percent'] = (
             100 * df['renter_occupied_housing_units'] / df['housing_units'])
         df.renter_occupied_percent = df.renter_occupied_percent.round()
+        df['vacant_housing_units_percent'] = (
+            100 * df['vacant_housing_units'] / df['housing_units'])
+        df.vacant_housing_units_percent = (
+            df.vacant_housing_units_percent.round())
         records = df.to_dict(orient='records')
         if len(records) == 1:
             return records[0]
@@ -108,6 +114,5 @@ class CensusACS(object):
 
 if __name__ == "__main__":
     c = CensusACS('2015')
-    # response = c.get_congressional_districts("09")
-    response = c.get_data("09", "state_legislative_district_lower", "001")
+    response = c.get_data("09", "county", "007")
     print(json.dumps(response))
