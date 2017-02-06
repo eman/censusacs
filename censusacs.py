@@ -100,7 +100,10 @@ class CensusACS(object):
     def get_census_tracts(self, state, tract="*"):
         tracts = self.get_data(state, 'tract', "*")
         if tract != "*":
-            tracts = [t for t in tracts if t['tract'] == tract][0]
+            tract = tract[3:]
+            tracts = [t for t in tracts if t['tract'] == tract]
+            if tracts:
+                return tracts[0]
         return tracts
 
     def get_state_legislative_districts_upper(self, state, district="*"):
