@@ -1,7 +1,7 @@
+import os
 import json
 import requests
 import pandas as pd
-
 
 ACS_ENDPOINT = 'https://api.census.gov/data/{year}/{frequency}'
 VARIABLES = {'NAME': 'geography_name',
@@ -56,6 +56,8 @@ class CensusACS(object):
         if geography_type == 'state':
             params.pop('in')
             params['for'] = state
+        if os.environ.get('CENSUS_API_KEY'):
+            params['key'] = os.environ.get('CENSUS_API_KEY')
         params_str = "&".join("{}={}".format(k, v) for k, v in params.items())
         response = requests.get(self.acs_endpoint, params_str)
         print(response.url)
@@ -97,6 +99,9 @@ class CensusACS(object):
     def get_counties(self, state, county="*"):
         return self.get_data(state, 'county', county)
 
+    def get_places(self, state, place="*"):
+        return self.get_data(state, 'place', place)
+
     def get_census_tracts(self, state, tract="*"):
         tracts = self.get_data(state, 'tract', "*")
         if tract != "*":
@@ -116,6 +121,6 @@ class CensusACS(object):
 
 
 if __name__ == "__main__":
-    c = CensusACS('2015')
+    c = CensusACS('2010')
     response = c.get_data("09", "county", "007")
-    print(json.dumps(response))
+    print(json.dumps(response, indent=2))
