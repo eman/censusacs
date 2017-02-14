@@ -15,6 +15,7 @@ VARIABLES = {'NAME': 'geography_name',
 
 ALTERNATE_KEYS = {
     'census_tract': 'tract',
+    'municipality': 'county+subdivision',
     'state_legislative_district_lower':
         'state+legislative+district+(lower+chamber)',
     'state_legislative_district_upper':
@@ -36,6 +37,7 @@ class CensusACS(object):
     def __init__(self, year, frequency='acs5', variables=VARIABLES.keys()):
         self.year = year
         self.frequency = frequency
+        self.api_key = os.environ.get('CENSUS_API_KEY', None)
         if isinstance(variables, str):
             variables = [variables]
         self.variables = list(variables)
@@ -44,7 +46,41 @@ class CensusACS(object):
     def acs_endpoint(self):
         return ACS_ENDPOINT.format(year=self.year, frequency=self.frequency)
 
-    def get_data(self, state, geography_type, geography="*"):
+    def get_querystring(self, geography, geography_type, **kwargs):
+        variables = ','.join(self.variables)
+        geographies = "{}:{}".format(geography_type, geography)
+        within = "+".join(["{}:{}".format(k, v) for k, v in kwargs.items()])
+        params = {'get': variables, 'for': geographies, 'in': within}
+        if self.api_key is not None:
+            params['key'] = self.api_key
+        return "&".join("{}={}".format(k, v) for k, v in params.items())
+
+    @staticmethod
+    def format_response(response, columns):
+        df = pd.DataFrame(response, columns=columns)
+        df.rename(columns=VARIABLES, inplace=True)
+        df.owner_occupied_housing_units = pd.to_numeric(
+            df.owner_occupied_housing_units)
+        df.renter_occupied_housing_units = pd.to_numeric(
+            df.renter_occupied_housing_units)
+        df.housing_units = pd.to_numeric(df.housing_units)
+        df.vacant_housing_units = pd.to_numeric(df.vacant_housing_units)
+        df['owner_occupied_percent'] = (
+            100 * df['owner_occupied_housing_units'] / df['housing_units'])
+        df.owner_occupied_percent = df.owner_occupied_percent.round(0)
+        df['renter_occupied_percent'] = (
+            100 * df['renter_occupied_housing_units'] / df['housing_units'])
+        df.renter_occupied_percent = df.renter_occupied_percent.round()
+        df['vacant_housing_units_percent'] = (
+            100 * df['vacant_housing_units'] / df['housing_units'])
+        df.vacant_housing_units_percent = (
+            df.vacant_housing_units_percent.round())
+        records = df.to_dict(orient='records')
+        if len(records) == 1:
+            return records[0]
+        return records
+
+    def get_data(self, state, geography_type, geography="*", **kwargs):
         if not isinstance(geography, str):
             geography = ','.join(geography)
         if geography_type in ALTERNATE_KEYS:
@@ -99,13 +135,24 @@ class CensusACS(object):
     def get_counties(self, state, county="*"):
         return self.get_data(state, 'county', county)
 
+    def get_county_subdivisions(self, state, subdivision="*"):
+        geography_type = 'county+subdivision'
+        subdivisions = self.get_data(state, geography_type, subdivision='*')
+        if subdivision != "*":
+            subdivision = subdivision[-5:]
+            divisions = [d for d in subdivisions
+                         if d['county subdivision'] == subdivision]
+            if divisions:
+                return divisions[0]
+        return divisions
+
     def get_places(self, state, place="*"):
         return self.get_data(state, 'place', place)
 
     def get_census_tracts(self, state, tract="*"):
         tracts = self.get_data(state, 'tract', "*")
         if tract != "*":
-            tract = tract[3:]
+            tract = tract[-6:]
             tracts = [t for t in tracts if t['tract'] == tract]
             if tracts:
                 return tracts[0]
@@ -122,5 +169,6 @@ class CensusACS(object):
 
 if __name__ == "__main__":
     c = CensusACS('2010')
-    response = c.get_data("09", "county", "007")
+    # response = c.get_county_subdivisions('09', '0900958300')
+    response = c.get_census_tracts('09', '09001240200')
     print(json.dumps(response, indent=2))
