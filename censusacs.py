@@ -4,14 +4,21 @@ import requests
 import pandas as pd
 
 ACS_ENDPOINT = 'http://api.census.gov/data/{year}/{frequency}'
-VARIABLES = {'NAME': 'geography_name',
-             'B01001_001E': 'total_population',
-             'B19013_001E': 'median_household_income',
-             'B11011_001E': 'total_households',
-             'B25001_001E': 'housing_units',
-             'B25075_001E': 'owner_occupied_housing_units',
-             'B25003_003E': 'renter_occupied_housing_units',
-             'B25002_003E': 'vacant_housing_units'}
+VARIABLES = {
+    'NAME': 'geography_name',
+    'B01001_001E': 'total_population',
+    'B19013_001E': 'median_household_income',
+    'B11011_001E': 'total_households',
+    'B25001_001E': 'housing_units',
+    'B25075_001E': 'owner_occupied_housing_units',
+    'B25003_003E': 'renter_occupied_housing_units',
+    'B25002_003E': 'vacant_housing_units',
+    'B17026_010E': 'two_times_fpl',
+    'B17026_011E': 'three_times_fpl',
+    'B17026_012E': 'four_times_fpl',
+    'B17026_013E': 'five_times_fpl',
+    'B17026_001E': 'total_income_to_poverty',
+    'B19326_001E': 'median_income_last_12_months'}
 
 ALTERNATE_KEYS = {
     'census_tract': 'tract',
