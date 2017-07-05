@@ -3,7 +3,7 @@ import json
 import requests
 import pandas as pd
 
-ACS_ENDPOINT = 'http://api.census.gov/data/{year}/{frequency}'
+ACS_ENDPOINT = 'https://api.census.gov/data/{year}/{frequency}'
 VARIABLES = {
     'NAME': 'geography_name',
     'B01001_001E': 'total_population',
