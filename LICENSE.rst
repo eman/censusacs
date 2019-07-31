@@ -1,6 +1,6 @@
 License
 ===============================================================================
-Copyright © 2017, Kevala Analytics, INC.
+Copyright © 2019, Kevala, INC.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
