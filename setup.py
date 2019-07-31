@@ -14,10 +14,10 @@ for rst in ("README.md", "LICENSE.rst"):
 
 setup(
     name="censusacs",
-    version="0.9.8",
+    version="0.9.9",
     description=description,
     long_description="\n\n".join(long_descriptions),
-    author="Kevala Analytics, Inc.",
+    author="Kevala, Inc.",
     author_email="eman@kevalaanalytics.com",
     url="https://://github.com/KevalaAnalytics",
     license="BSD",
