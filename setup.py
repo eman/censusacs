@@ -7,7 +7,7 @@ project_dir = os.path.abspath(os.path.dirname(__file__))
 description = "Cenus ACS - Get ACS Data from the US Census"
 
 long_descriptions = []
-for rst in ("README.md", "LICENSE.rst"):
+for rst in ("README.rst", "LICENSE.rst"):
     with open(os.path.join(project_dir, rst), "r") as f:
         long_descriptions.append(f.read())
 
